@@ -18,8 +18,8 @@ details video{aspect-ratio:1/1;max-width:520px;border-radius:10px;margin-top:8px
 footer a{color:#B3202A}
 </style></head><body>
 <header><img src="https://teond1090.github.io/tpp-safehugg-partnership/media/logos.png" alt="Tenant Property Protection + SafeHugg"><p>TPP welcomes SafeHugg as our Preferred Partner</p></header>
-<main><h1>TPP &amp; Safe Hugg Partnership</h1><div class="meta">30 s &middot; 16:9 HD (1920&times;1080) for LinkedIn, YouTube and event screens &middot; square 1:1 for the LinkedIn and Facebook feeds</div>
-<div class="card"><video id="v" controls playsinline preload="auto" poster="https://teond1090.github.io/tpp-safehugg-partnership/media/partnership_16x9.jpg" src="https://teond1090.github.io/tpp-safehugg-partnership/media/partnership_16x9.mp4"></video>
+<main><h1>TPP &amp; Safe Hugg Partnership</h1><div class="meta">31 s &middot; 16:9 HD (1920&times;1080) for LinkedIn, YouTube and event screens &middot; square 1:1 for the LinkedIn and Facebook feeds</div>
+<div class="card" style="position:relative"><video id="v" controls playsinline preload="auto" poster="https://teond1090.github.io/tpp-safehugg-partnership/media/partnership_16x9.jpg" src="https://teond1090.github.io/tpp-safehugg-partnership/media/partnership_16x9.mp4"></video><button id="unmute" type="button" style="display:none;position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);align-items:center;gap:10px;border:0;border-radius:999px;background:rgba(179,32,42,.95);color:#fff;font:600 18px Segoe UI,system-ui,sans-serif;padding:16px 26px;box-shadow:0 10px 30px rgba(0,0,0,.4);cursor:pointer">&#128266; Tap for sound</button>
 <div class="body"><a class="btn" href="https://teond1090.github.io/tpp-safehugg-partnership/media/partnership_16x9.mp4" download>Download 16:9 HD</a><a class="btn blue" href="https://teond1090.github.io/tpp-safehugg-partnership/media/partnership_1x1.mp4" download>Download 1:1 square</a>
 <div class="cap"><b>Suggested LinkedIn post</b>
 Big news for self storage: SafeHugg is now a TPP Preferred Partner!
@@ -35,9 +35,21 @@ tenantpropertyprotection.com | safehugg.com
 </div></div></main>
 <footer>Tenant Property Protection &middot; <a href="https://tenantpropertyprotection.com/">tenantpropertyprotection.com</a> &middot; SafeHugg &middot; <a href="https://www.safehugg.com/">safehugg.com</a></footer>
 <script>
-// autoplay muted 2 s after the video has loaded (browser rule); a tap turns the sound on
-var v = document.getElementById('v'), started = false;
-v.addEventListener('click', function(){ if (v.muted) { v.muted = false; if (v.paused) v.play().catch(function(){}); } });
-function go(){ if (started) return; started = true; setTimeout(function(){ v.muted = true; v.play().catch(function(){}); }, 2000); }
+// user (2026-10-22): the video must NOT open muted. Browsers only allow autoplay WITH sound after the visitor has
+// interacted with the site (a tap/click). So: 2 s after load we try to play with sound; if the browser refuses, we play
+// muted and show a big speaker button, and the first tap anywhere on the page turns the sound on.
+var v = document.getElementById('v'), started = false, btn = document.getElementById('unmute');
+function soundOn(){ v.muted = false; v.volume = 1; btn.style.display = 'none'; if (v.paused) v.play().catch(function(){}); }
+btn.addEventListener('click', function(e){ e.stopPropagation(); soundOn(); });
+document.addEventListener('pointerdown', function(){ if (v.muted) soundOn(); }, {once:true});
+v.addEventListener('volumechange', function(){ if (!v.muted) btn.style.display = 'none'; });
+function go(){
+  if (started) return; started = true;
+  setTimeout(function(){
+    v.muted = false; v.volume = 1;
+    var p = v.play();
+    if (p && p.catch) p.catch(function(){ v.muted = true; btn.style.display = 'flex'; v.play().catch(function(){}); });
+  }, 2000);
+}
 if (v.readyState >= 2) go(); else v.addEventListener('loadeddata', go, {once:true});
 </script></body></html>
